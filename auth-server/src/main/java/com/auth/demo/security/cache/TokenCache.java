@@ -1,8 +1,12 @@
 package com.auth.demo.security.cache;
 
+import com.auth.demo.security.domain.LoginUser;
+import com.auth.demo.security.domain.LoginUserDao;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -15,6 +19,16 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class TokenCache {
     private ConcurrentHashMap<String, UserDetails> tokenCache = new ConcurrentHashMap<>();
+
+    public TokenCache(){
+        LoginUser user = new LoginUser();
+        LoginUserDao dao = new LoginUserDao();
+        dao.setUsername("admin");
+        dao.setPassword(new BCryptPasswordEncoder().encode("admin"));
+        dao.setPermissions(Arrays.asList("userAdmin"));
+        user.setLoginUserDao(dao);
+        tokenCache.put("123456", user); //初始化一个登录用户方便测试
+    }
 
     public UserDetails getUserDetails(String token){
         return tokenCache.get(token);

@@ -1,5 +1,6 @@
 package com.auth.demo.oauth.config;
 
+import com.auth.demo.oauth.interceptor.RedirectCodeInterceptor;
 import com.auth.demo.security.config.UserDetailServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -34,6 +35,9 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     @Autowired
     private UserDetailServiceImpl userDetailServiceImpl;
 
+    @Autowired
+    private RedirectCodeInterceptor codeInterceptor;
+
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
         clients.inMemory()
@@ -64,6 +68,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
         endpoints.authenticationManager(authenticationManager) //密码模式时需要配置认证管理器
                 .reuseRefreshTokens(false) //同一个refresh_token是否可以重复使用
                 .userDetailsService(userDetailServiceImpl)
+                .addInterceptor(codeInterceptor) //所有认证处理的拦截器,可以用于修改重定向的选择
                 .allowedTokenEndpointRequestMethods(HttpMethod.POST); //支持POST
 
         //自定义授权页，传给前端scope
@@ -79,6 +84,4 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
         security.checkTokenAccess("isAuthenticated()")
                 .tokenKeyAccess("isAuthenticated()");
     }
-
-
 }
