@@ -6,6 +6,7 @@
     <modules>
         <module>auth-server</module>
         <module>test</module>
+        <module>security-server</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>
