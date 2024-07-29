@@ -6,4 +6,9 @@ CustomNameAuthenticationFilter       ->      CustomOtherAuthenticationFilter    
    (只处理/login/password请求,非这个请求跳过)     (只处理/login/password请求,非这个请求跳过)     (其他[非permitAll]请求判断Session是否有效)
             |-NameAuthenticationProvider                 |-OtherAuthenticationProvider
 
-token维护
+token维护(Spring-Session)
+    1.ForwardSuccessHandlerImpl#onAuthenticationSuccess 认证成功会转发到/login/success上
+    2./login/success处理的RequestHandler,调用request.getSession()创建Session对象
+    3.当响应完成后调用flushBuffer方法时触发SaveToSessionResponseWrapper#saveContext方法将SecurityContext认证结果都存到Session中
+    4.SessionRepositoryFilter过滤器会在finally调用SessionRepositoryRequestWrapper#commitSession,将Session进行持久化,通过
+    RedisIndexedSessionRepository存放到redis中,还会调用HeaderHttpSessionIdResolver#setSessionId方法将SessionId放到响应头中
